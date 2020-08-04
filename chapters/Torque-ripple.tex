@@ -1,6 +1,4 @@
 \section{Origin of torque ripple}
-
-%Ripples due to mechanical parts cannot be estimated from the electrical subsystem \cite{ILC:2018}. All possible sources of torque ripples are observable from the rotor speed \cite{ILC:2018}. 
 In this chapter, all important factors affecting torque ripple are discussed. FEA is utilized for analyzing torque ripple and its sources. A model of a 160-kW motor is used and its parameters are listed in Table \ref{FEM_motor_params}. The motor cross section in Fig. \ref{FEM_flux} shows the magnet placement, stator slots as well as flux density distribution of the PM motor.
 
 \begin{table}[ht]
@@ -16,7 +14,7 @@ Nominal frequency & $f_N$      & 155.0  & Hz\\
 Nominal speed     & $\omega_N$ & 3100   & rpm\\
 Nominal power     & $P_N$      & 160.0  & kW\\
 Nominal torque    & $T_N$      & 493.0  & Nm\\
-Number of poles   & $N_p$      & 6     & \\
+Number of poles   & $N_p$      & 6      & \\
 Number of stator slots & $N_s$ & 72     & \\
 \hline
 \label{FEM_motor_params}
@@ -30,9 +28,9 @@ Number of stator slots & $N_s$ & 72     & \\
     \label{FEM_flux} 
 \end{figure}
 
-\subsection{PMSM model} \label{PMSM model}
 
-Assuming that eddy currents and hysteresis losses are negligible, stator surface is smooth and magnetomotive force (MMF) of the stator windings is sinusoidal, the flux linkages along the d–q axes in the rotor reference frame are given by \cite{Vector-control} % check citation
+\subsection{PMSM model} \label{PMSM model}
+Assuming that eddy currents and hysteresis losses are negligible, stator surface is smooth and magnetomotive force (MMF) of the stator windings is sinusoidal, the flux linkages along the d–q axes in the rotor reference frame are given by \cite{Vector-control}
 \begin{equation}
     \begin{split}
         & \psi_{d} = L_{d} i_{d} + \psi_f
@@ -70,7 +68,6 @@ In order to make the model to reflect non-ideal reality more accurately, also po
     \label{torque_eq3}
 \end{equation}
 where $T_{cog}$ and $T_{\Delta I}$ are periodic torque pulsations due to cogging torque and current measurement errors, respectively.
-% Mention that high speeds the pulsation effect is not as strong -- dampening. use inertai eq.
 
 The equation of motion is
 \begin{equation}
@@ -78,13 +75,9 @@ The equation of motion is
     \label{PMSM_dynamics}
 \end{equation}
 where $\omega_m = \omega_e / p$ is the mechanical angular speed, $T_l$ is the load torque, $B$ is the viscous damping coefficient and $J$ is the total inertia (motor and load) \cite{ILC:2005}. 
-%From this equation, it can be concluded that speed fluctuations decrease when the inertia increases.
+
 
 \subsection{Relation between torque and speed pulsations}
-
-%Higher rotation speeds can be seen to increase the inertia which in turn leads to reduced fluctuations. Speed increase shifts the torque ripple to a higher frequency and therefore its negative effects to speed weaken. Due to spontaneous dampening, the active ripple minimization is not as important at high speeds as it is on low speeds.
-
-%Increase in the speed shifts the torque ripple to a higher frequency.
 The 160-kW motor was run with a constant speed reference in a simulation environment. The FEM simulation was repeatedly stepped forward while instantaneous torque and rotor speed were numerically computed. Motion equation \eqref{PMSM_dynamics} was used in the simulation. Computation result in Fig. \ref{SDM_speed_torque} shows undesired speed and torque fluctuations, even when the machine speed was controlled with a PI controller and the speed reference was kept constant. Thereby, disturbances must be present, since the system never stabilizes.
 \begin{figure}[htb]
     \centering
@@ -92,16 +85,6 @@ The 160-kW motor was run with a constant speed reference in a simulation environ
     \caption{Torque and speed pulsations of the 160-kW motor}
     \label{SDM_speed_torque} 
 \end{figure}
-
-%\begin{figure}[htb] 
-%    \centering
-%    \includegraphics[width=0.6\linewidth]{images/flux_density.png} 
-%    \caption{Flux density distribution of the $160$-kW PM motor} 
-%    \label{FEM_flux} 
-%\end{figure}
-
-% With higher frequencies, the speed oscillations diminish spontaneously.
-%With higher frequencies, the speed oscillations diminish spontaneously. This can be reasoned from the frequency response corresponding to \eqref{Eq:transfer_function}.
 
 Equation \eqref{PMSM_dynamics} allows to derive the transfer function between mechanical angular velocity $\omega_m$ and electromagnetic torque $T_m$
 \begin{equation}
@@ -117,32 +100,10 @@ Another FEM computation was performed at different speeds and in open-circuit co
     \caption{Cogging torque of the 160-kW motor in different speeds}
     \label{FEM_orders}
 \end{figure}
-%in which the harmonic orders are given with respect to the mechanical frequency of the rotor, 
-% Harmonic order into picture and to text:
-% Harmonic order considering the mechanical frequency of the rotor as the fundamental frequency
-% considering the mechanical frequency of the rotor as the fundamental frequency
 
-%Torque data was computed with respect to the rotor angle and then the amplitudes of certain harmonic orders were collected. Thereby, Fig. \ref{FEM_orders} shows cogging torque of the 160-kW motor in different operating points. Since sampling was done with respect to the rotor angle, the sampling frequency had to be altered between different computations. When speed was doubled, the sampling frequency had to be halved in order to maintain a constant sampling rate. This practice would eventually lead to aliasing, thus only a few operating points were captured and the initial sampling rate was set very high.
 
-% ===================================================================================================================
 \subsection{Cogging torque}
-
-% Application of a multiobjective.. \cite{TRR:1999}
-% Comparison of Cogging.. \cite{CTR_HW:2013}
-% simulation:2011
-
 Cogging torque arises from interaction between magnets and stator teeth. The magnets create magnetic field around the rotor whilst slots in stator induce permeance variation in airgap. Due to permeance variation, the rotor seeks a position where the permeance of the magnetic circuit is maximized \cite{TRR:1999, CTR_HW:2013}. This creates periodic torque on the shaft, which may generate undesired mechanical vibrations and noise. Since torque pulsations give rise to speed oscillations similarly to Fig. \ref{SDM_speed_torque}, also accurate position control gets more difficult. This explains why ripple minimization is particularly important with servomotors. 
-
-%The pulsations and their relation can be seen from Fig. \ref{SDM_speed_torque}, which shows measured speed and estimated torque of a loadless PM servomotor. Due to inertia (see Eq. \ref{PMSM_dynamics}), the speed varies more moderately than the torque estimate. Additionally, a small delay between the signals can be observed. The gains of the speed controller were set low to produce smooth signal.
-
-%The pulsations in Fig. \ref{SDM_speed_torque} are generated mostly by cogging torque, since the speed reference was kept constant $60$ rpm and no load was connected to the shaft of the servomotor.
-
-%\begin{figure}[ht]
-%    \centering
-%    \includegraphics[width=1\linewidth]{images/torque_speed_pulsations.pdf}
-%    \caption{Torque and speed pulsations of a PM servomotor (SDM-251)}
-%    \label{SDM_speed_torque} 
-%\end{figure}
 
 Cogging torque can be expressed as Fourier series \cite{CTR_HW:2002, CTR_HW:2004, cogging:2006, CTR:2010, CTR_HW:2013, CTR_HW_skew:2013, CTR_SW:2017, CTR_HW:2017}. For a single slot, the cogging torque is given by \cite{cogging:2006, CTR_HW:2013}
 \begin{equation}
@@ -158,28 +119,6 @@ By mathematically manipulating the equation, it can be deduced that only the ter
 
 FEA was performed for the 160-kW PM motor. The cogging torque of the motor was computed and fast Fourier transform (FFT) was applied in order to obtain the cogging torque harmonics. The harmonics can be seen in Figs. \ref{FEM_orders} and \ref{FEM_cogging_harmonics}. When ignoring the DC component, the first significant amplitude has the harmonic order of $72$. This result is congruent with previous equations and statements as the same order can be also obtained by calculating, lcm$(N_p, N_s) = 72$. The number of slots and poles are listed in Table \ref{FEM_motor_params}. The $72$nd harmonic has approximately amplitude of $4.6$ Nm, which is roughly $1\%$ of the nominal torque.
 
-%\begin{table}[ht]
-%\centering
-%\caption{Motor parameters of the FEA motor}
-%\begin{tabular}[t]{lcc}
-%\hline
-%Description & Value\\
-%\hline
-%$P_n$ & 160.032 kW\\
-%$T_n$ & 493.0 Nm\\
-%$f_n$ & 155.0 Hz\\
-%$U_n$ & 370.0 V\\
-%Rated speed & 3100 rpm\\
-%Poles & 24\\
-%Stator slots & 72\\
-%\hline
-%\label{FEM_motor_params}
-%\end{tabular}
-%\end{table}%
-
-% Parameter & Symbol & value1 & value2 
-
-
 \begin{figure}[htb] 
     \centering
     \includegraphics[width=1.0\linewidth]{images/cogging_harmonics.pdf} 
@@ -187,8 +126,8 @@ FEA was performed for the 160-kW PM motor. The cogging torque of the motor was c
     \label{FEM_cogging_harmonics}
 \end{figure}
 
-\subsection{Flux harmonics}
 
+\subsection{Flux harmonics}
 Flux density distribution in the airgap and the MMF of the stator windings are seldom ideally sinusoidal. Due to nonsinusoidality, the phase flux linkages contain harmonics of the order of $5,7,11,...$ \cite{TRR_SW:1998}. In rotor reference frame, the corresponding spatial harmonics appear as multiples of sixth-order harmonic components, and can be expressed as \cite{ILC:2004, ILC:2005, ILC:2018}
 \begin{equation}
     \psi_{f} = \psi_{d0} + \sum_{j=\text{1}}^{\infty} \psi_{d6j} \, \text{cos}(j6\theta_e)
@@ -203,33 +142,18 @@ Combining \eqref{torque_eq} and \eqref{flux_harmonics_eq1} yields
 \end{equation}
 where $T_0$ and $T_{6j}$ are the DC component and harmonic torque amplitudes, respectively. Equation \eqref{flux_harmonics_eq2} indicates that produced torque pulsations are periodic in nature. FEM computation done at nominal point with constant speed confirms the periodicity of pulsations and it also shows the sixth harmonic multiples to be especially prominent in Fig. \ref{FEM_flux_harmonics}.
 
-%The periodic tendency can be also observed from finite element method (FEM) computed flux density distribution in Fig. \ref{FEM_flux}. The airgap flux density variation is not smooth enough to be sinusoidal. This density variation induces torque pulsation when the rotor angle changes. 
-
-%Finite element method (FEM) computed flux density distribution of the $160$-kW motor is shown in Fig. \ref{FEM_flux}. The flux harmonics induced by the distribution can be seen in Fig. \ref{FEM_flux_harmonics}. It can be observed that the prominent flux harmonics truly are sixth-multiples of the fundamental frequency. For example, the first harmonic is located at $6 \cdot 155$ Hz $ = 930Hz$.
-
-%\begin{figure}[ht] 
-%    \centering
-%    \includegraphics[width=0.6\linewidth]{images/flux_density.png} 
-%    \caption{Flux density distribution of the PM motor} 
-%    \label{FEM_flux} 
-%\end{figure}
-
 \begin{figure}[ht] 
     \centering
     \includegraphics[width=1.0\linewidth]{images/fem-flux-harmonics.pdf} 
     \caption{Torque harmonics of the $160$-kW motor, when considering the supply frequency (155 Hz) as the fundamental frequency}
     \label{FEM_flux_harmonics}
 \end{figure}
-% Torque harmonics of the $160$-kW motor with respect to the electrical rotor angle, $\theta_e$
 
 It is good to note that Figs. \ref{FEM_flux} and \ref{FEM_flux_harmonics} do not only include the effects of the flux harmonics but also cogging torque, because of overlapping frequencies. When rotor flux is calculated in different rotor angles in time stepping simulation, also cogging torque is inevitably captured. Cogging torque could be subtracted from the result, though this serves no purpose, as the objective is to minimize both disturbances simultaneously.
 
-% ===================================================================================================================
+
 \subsection{Current measurement errors}
-
 Current measurement errors contribute to the torque ripple \cite{current_scaling:1998, ILC:2004, ILC:2005, CTR_SW_ff:2011, ILC:2012, ILC:2018}. The errors can be considered to be the offset and scaling errors \cite{current_scaling:1998, ILC:2004, CTR_SW_ff:2011, ILC:2012}. The stator currents are measured and transduced into voltage signals by current sensors. The voltages are then transformed into digital form by analog-to-digital (A/D) converters \cite{current_scaling:1998, ILC:2005}, so that the control can utilize the measured values. The current measurement errors emerge during this process.
-
-%Practically there is always some amount of current offset. The current scaling errors are also inevitable as A/D conversions has to be made \cite{current_scaling:1998}. The current sensor output must be scaled to match with the A/D converter input, whilst the controller re-scales the converted digital value in order to obtain the actual current value \cite{ILC:2005}.
 
 If there is any unbalance between the phase voltages supplied to the motor, or, if the analog devices include inherent offset, then DC offset current will be introduced. When measuring two phase currents and assuming ideal current control, the current offset related torque error can be described by \cite{current_scaling:1998}
 \begin{equation}
@@ -246,7 +170,6 @@ A FEM computation with intentionally introduced current offset error was perform
     \label{FEM_current-meas-error}
 \end{figure}
 
-% Torque harmonics of the $160$-kW motor considering the supplied frequency (155 Hz) as fundamental frequency
 The measured phase currents must be scaled to fit in the input range of the A/D converter. The A/D converter output is then re-scaled by the current controller, so that real current values can be obtained. Scaling errors are inevitable \cite{current_scaling:1998}. The torque error coming from the scaling errors can be described as \cite{current_scaling:1998, ILC:2005}
 \begin{equation}
     \Delta T_{m2} = \left(\frac{K_a - K_b}{K_a K_b}\right) \: \frac{k_t I}{\sqrt{3}} \: \left[\text{cos}\left(2 \theta_e + \frac{\pi}{3}\right)+ \frac{1}{2}\right]

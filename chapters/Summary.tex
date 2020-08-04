@@ -1,12 +1,8 @@
-% Future research: Disturbance model by using Gaussian process with a periodic kernel.
-% - Disturbances are a smooth function and also periodic!
-
 \section{Conclusion} 
-
 ILC based compensation was tested with two PM motors. It was verified that ILC can be used for compensation with industrial PM motors. When testing with different loads, it was noticed that the same gain values may not work in every operating point. This is a significant drawback, since manual gain tuning was found tedious. Therefore, a gain scheduling algorithm may be required if operating conditions change and maximum compensation performance is pursued with high gain values.
 
 It was demonstrated that Q-learning can be used for ripple reduction. Experimental tests show that compensation performance is similar to ILC, which is one of the best automatic compensation methods. Therefore, it is safe conclude that the Q-learning based method is effective. With the servomotor, the Q-learning method managed to reduced speed ripple 73\%. The compensator is modular and it can be easily applied to the existing control loop. Compensation is automatic, which allows the method to be utilized with weak system knowledge. The compensator does not have dependency on motor parameters, which allows it to be easily used with various motors. However, the current implementation still requires rough estimate of the maximum pulsation magnitude.
 
 Many improvements could be made to the compensators. The Q-learning based compensator could be simplified by reducing parameters, as some of these seemed to have only minimal effect on the performance. It would be also interesting to test if the maximum amplitude parameter $T_{max}$ could be fixed to some percentage of the motor nominal torque. In contrast to simplifying, it would be also intriguing to test if existing double Q-learning or periodic Q-learning algorithms could provide even better results than the conventional Q-learning algorithm. Finally, it would be also interesting to implement a tabular ILC compensator, which saves compensation values to a table similarly to Q-learning. 
-%rollout - no need to really execute actions, simulate them
+
 \clearpage

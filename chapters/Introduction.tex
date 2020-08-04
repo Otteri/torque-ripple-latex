@@ -1,61 +1,21 @@
 \section{Introduction}
-
-%% Leave page number of the first page empty
-
-% Add:
-% encoder / resolver is assumed to be available
-% Method is for mass produced (industrial) machines
-% Plant may not be accurately known. Cannot design observer
-% Plug and play compensator
-
 \thispagestyle{empty}
-
 Permanent magnet (PM) machines are commonly used in high-performance applications due to numerous favorable characteristics, including high efficiency, power density and reliability. However, PM machines also incorporate inherent torque ripple, which causes mechanical vibrations, acoustic noise and uneven torque production leading to degraded controllability of the machine \cite{ILC:2018}. Inevitably, the performance of PM machines can be improved by minimizing the torque ripple.
 
 The torque ripple originates from various phenomena. In sight of ripple minimization, the most important ripple sources consist of cogging torque, flux harmonics and current measurement errors. Not only have been these sources commonly acknowledged \cite{ILC:2005,ILC:2012,CTR_SW:2017,ILC:2018}, but also their contribution to the ripple can be reduced by improving control of the machine. In addition to these three ripple sources, also others exist, yet these are not considered in this thesis due to significantly lower performance impact.
 
-%Cogging torque arises from interaction between magnets and the stator teeth \cite{TRR:1999}. The rotor tries to align with the stator in order to seek energy minimum, which creates additional torque that contributes to the torque ripple. Flux harmonics are another ripple source. The flux density distribution, or the magnetomotive force (mmf) of the stator winding, may not be sinusoidally distributed in space and this imperfect distribution then induces flux harmonics \cite{ILC:2018}. Third important ripple source is current offset and scaling errors \cite{ILC:2018}, that are inevitable due to limited accuracy of practical systems.
-
 Many solutions have been proposed for minimizing the torque ripple. In general, these solutions can be divided into two categories \cite{CTR_SW:1993, CTR_SW:1998, CTR_SW:2017, ILC:2012, ILC:2018}. The methods in the first category aim to improve the geometry of the machine, thus leading to reduced torque ripples. Although, these methods are ordinarily effective, the approach can be impractical and costly to realize, if the machine has been manufactured already. The methods in the second category aim to compensate for the ripple by improving control algorithms. These approaches have the benefit of being cost-effective, since software changes can be applied to already existing control platform \cite{ILC:2018}. The thesis focus will be in the methods of the second category, as the objective is to reduce torque ripple occurring in already existing machines.
 
-
 Iterative learning control (ILC) seems one of the most prominent compensation methods in the light of current research. ILC is easy to take into use, compensation is automatic and the method only requires measuring of the rotor speed. Due to these attractive features, ILC is studied extensively. Unfortunately, ILC also has some shortcomings. For example, the compensator must be tuned carefully and its behaviour is not always fully predictable. Careful gain tuning is time consuming and may require domain expertise. Furthermore, fixed gain values may not work in all operating conditions and hence the gains may require retuning if operating conditions change. Some ILC based compensation schemes have been also patented \cite{ILC:patent, ILC:patent2}, thus potentially restricting use of ILC. 
-
-%Several attempts to improve the original method has been made \cite{ILC:2005, ILC:2012, ILC:2018}, yet none of these methods overcome the aforementioned problems.
-
-%In order to justify the selection of this particular method, all the recent minimization methods and their limitations are briefly outlined.  However, the ILC is not perfect and has its weaknesses too. 
-
-%For example, the ripple minimization is not instantaneous, controller must be tuned carefully and testing the algorithm for errors can be challenging. Some ILC based compensation schemes have been also patented \cite{ILC:patent, ILC:patent2}, which may restrict the use of ILC. Several attempts to improve the original method has been made \cite{ILC:2005, ILC:2012, ILC:2018}, yet none of these methods overcome the aforementioned problems.
 
 During recent years, reinforcement learning (RL) has increasingly gained popularity and RL methods have been successfully used for solving various complex problems automatically. In \cite{RL:control, RL:control2}, RL was used to solve control problems, such as balancing an inverted pendulum and controlling a gripper in a simulation environment. In \cite{RL:atari}, RL was used to train an agent to play Atari 2600 games. In many games, the agent was able to achieve a performance level comparable to a professional game tester. In \cite{RL:alphago}, RL was utilized to train an agent capable of defeating the European Go champion. By considering the complexity of the previous problems, it can be reasoned that RL methods could be potentially used for building a compensator.
 
 Q-learning is a reinforcement learning algorithm, which can be used to learn a policy that compensates for torque pulsations. The compensator based on this algorithm can overcome the weaknesses of ILC while also maintaining its key strengths. Similarly to ILC, the algorithm is computationally light, compensation is automatic and the compensator structure is modular. All control actions are known in advance with Q-learning algorithm, which makes it easy to predict the system behaviour. The adjustable parameters are easy to tune and tuning must be performed only once. Despite the numerous benefits, no work has yet attempted to evaluate the applicability of Q-learning in reducing torque ripple in industrial PM motors.
 
-
-
-
-
-%The Q-learning and angle-based ILC compensators will be implemented in practice. A simulator will be used for developing the controllers and then practical experiments are used for evaluating the final performance of the compensators. The Q-learning based compensator is compared against conventional PI-speed controller and the angle-based ILC.
-
 This thesis aims to demonstrate applicability of Q-learning for building a modular compensator that automatically reduces torque ripple. The compensator is implemented and torque ripple reduction is tested with industrial PM motors. The performance of the Q-learning based compensator is evaluated and compared against ILC and convention PI speed control. Therefore, the thesis will also validate the applicability of the ILC method with industrial PM machines.
 
 Various methods are used in order to produce a comprehensive study. Finite element analysis (FEA) is used to validate that cogging torque, flux harmonics and current measurement errors truly give rise to torque ripple. These simulations are time-consuming, hence a faster lumped-element motor control simulator is used for implementing and evaluating the theoretical performance of the compensators. The performance will be evaluated by comparing torque and speed pulsations in case of using conventional PI speed control, PI with ILC and PI with Q-learning based compensator. Finally, experimental tests are performed with 6-kW and 0.72-kW PM motors. The rotor speed is measured with a resolver to be able to evaluate compensation performance.
 
-%which is coupled to an another machine, thus allowing testing in different loads. The results will be verified by using an additional PM servomotor. The servomotor is not connected to any load and it has only resolver installed, hence only no-load speed measurement data will be used for verifying the results.
-
-%with an addition of also verifying the results by using another PM motor.
-
-%. The experimental tests are conducted on two different PM motor setups. The first setup allows the performance to be evaluated in terms of fluctuating speed and torque, since both can be measured.
-
-
-%The performance will be evaluated by comparing torque and speed ripples in cases of using conventional PI-control, ILC and Q-learning compensator. Experimental tests are conducted on two different PM motor setups. The first setup allows the performance to be evaluated in terms of fluctuating speed and torque, since both can be measured.
-
-%The second test setup is mainly used for verifying the results obtained with the first PM motor.
-
-%, as the setup only allows speed measurements in no-load conditions.
-
-
-%Final conclusions of the compensation performance will be made by using experimental results. Experimental tests are carried on two different PM motor setups. The first setup allows the performance to be evaluated in different load conditions and by using speed and torque measurements. The second test setup is only used for verifying the results, as the setup only allows speed measurements in no-load conditions.
-
 This thesis is organized as follows. Chapter 2 reviews the important ripple components and the mathematical model underlying PM synchronous motor (PMSM). Chapter 3 outlines the existing torque ripple minimization methods and their limitations. Chapter 4 describes ILC and its utilization for torque ripple minimization. Chapter 5 discusses the Q-learning based compensation scheme. Chapter 6 presents simulation results for ILC and Q-learning based compensation. Chapter 7 presents the experimental results comparing the compensation of conventional PI-control, ILC and Q-learning methods. Chapter 8 concludes by discussing the results and suggesting future work.
+
 \clearpage

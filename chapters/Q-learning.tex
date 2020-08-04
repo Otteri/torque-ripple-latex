@@ -1,7 +1,6 @@
 \section{Q-learning}
 Q-learning is one of the earliest reinforcement learning (RL) algorithms. It was discovered in 1989 \cite{RL:Watkins-Q} and the algorithm can be considered to be a significant milestone for RL research. The Q-learning algorithm is computationally light and simple to implement, which makes it perfect for embedded real-time systems. The implementation requires only creation of a structure resembling a lookup table, which can be implemented even on obsolete hardware.
 
-%The previous achievements were obtained by using sophisticated algorithms that utilize neural networks. However, it is not always possible to use neural networks, since these can be too memory or processing power demanding. Especially, in embedded real-time systems, large neural networks can be problematic due to limited system resources. Therefore, the algorithms presented in \cite{RL:control, RL:control2, RL:atari, RL:alphago} cannot be utilized and different one must be selected. 
 
 \subsection{Modelling the system}
 The Q-learning algorithm requires the system to be modelled. Markov decision processes (MDP) are widely used for modelling various systems mathematically \cite{RL:Single-step, RL:Sutton-Barto}. Control problems can be idealized by using MDPs, which makes it possible to make precise theoretical statements about the system \cite{RL:Sutton-Barto}. MDPs formalize sequential decision making \cite{RL:Sutton-Barto}, that is done in RL. In MDP, the decision maker is called an agent and everything outside the agent is called an environment \cite{RL:Sutton-Barto}. The agent continually interacts with the environment by making actions and the environment responds to actions by presenting new situations and outcomes \cite{RL:Sutton-Barto}. The outcomes are numerical values that are formally called rewards. The agent seeks to maximize the rewards by always taking the best actions in different situations. The situations can be formalized using states which consist of system parameters. Thereby, the agent-environment interaction can be mathematically presented by declaring a set of states $\mathcal{S}$, actions $\mathcal{A}$ and rewards $\mathcal{R}$. The agent must be always in some state, $s \in \mathcal{S}$ where it can do an action $a \in \mathcal{A}$, which produces reward $r \in \mathcal{R}$.
@@ -9,6 +8,7 @@ The Q-learning algorithm requires the system to be modelled. Markov decision pro
 The states should be defined to represent minimal amount of necessary information about the system. In the case of an electric motor and torque pulsations, the state should at least contain information about the rotor angle. This is because the torque pulsations depend on the rotor angle and the compensation must be done with respect to occurring pulsation. It can be also a good idea to include information about system load to the state. This is because the pulsation magnitudes depend on currents \eqref{torque_eq3} that vary under different loads. However, this is not implemented in order to save memory. The electrical rotor angle $\theta_e$ is quantized to $100$ possible values, thus allowing the system to be in $100$ different states.
 
 In order to compensate for pulsations, an injection causing destructive interference with the pulsations must be produced. The event of making appropriate injection can be expressed using actions. The agent selects a value and sums it to the q-axis current reference $i_q^*$ similarly to ILC and Fig. \ref{Compensator_control_diag}. In Q-learning, the actions, states and state-action values are held in a table, which is stored into the memory \cite{RL:Sutton-Barto}. Therefore, actions must be discretized and injection accuracy depends on discretization step size. Step size selection is a trade-off between memory usage, accuracy and learning speed. The effect on learning speed can be explained with the number of different states. With high step size and lower number of actions, the agent needs to interact less with the environment in order to conclude the "goodness" of each action.
+
 
 \subsection{Automatic action generation}
 Torque pulsations are periodic and continuous, therefore all pulsation values must lie between the peaks. Assuming symmetry of pulsations, then a set of actions can be generated only by knowing the pulsation maximum $T_{max}$. Specifying number of desired actions $N_a$, a linearly spaced action set $\mathcal{A} = \{-T_{max}, ..., T_{max}\}$ containing compensation values can be automatically generated. The pulsation maximum is rarely known in practice, hence it must be often estimated. It can be reasoned that it is better to overestimate $T_{max}$ than provide too small value, because potential performance degrade is lower. With too large estimate, it is still possible to include all required values into action set at the cost of worse resolution, whereas too small estimate results into inadequate action set. If learning time and memory space were not concerns, then both parameters could be set arbitrarily high.
@@ -22,19 +22,7 @@ It can be observed from FEM simulation result in Fig. \ref{FEM_flux_harmonics} t
 \end{figure}
 
 
-
-%Only few actions were used throughout this thesis in order to allow better comparison with ILC by consuming approximately the same amount of memory and for making the training faster. Figure \ref{fig:learned_pattern_torque} shows a learned compensation pattern consisting only four different actions. 
-
-
-
-%Since the aim of the thesis is to prove that Q-learning can be used for compensation, only a small set of actions is used to make the training quick. The small action set also makes the performance comparisons between ILC and Q-learning more valid in the sense that both compensators use approximately the same amount of memory space. The number of actions is parametrized in the implemented compensator, therby changing the number of actions is easy. In the first simulations, only five actions were defined $a \in {}$
-
-%select actions that maximize the cumulative future reward
-%\begin{equation*}
-%    Q^*(s_t, a_t) = \max_{\pi} E [r_t +\gamma r_{t+1} + \gamma^2 r_{t+2} + ... \; |s_t = s, a_t = a, \pi])
-%\end{equation*}
-
-\subsection{Q-learning algorithm} %  \cite{RL:control2}
+\subsection{Q-learning algorithm}
 Q-learning provides a capability for the agent to learn to act optimally in MDP \cite{RL:Watkins-Q}. The agent tries actions and evaluates the consequences in terms of received rewards and estimates of the next state value \cite{RL:Watkins-Q}. By repeatedly trying actions in all states, the agent eventually learns which actions are the best in overall \cite{RL:Watkins-Q}. The task of the agent is to determine an optimal policy that maximizes total discounted expected reward \cite{RL:Watkins-Q}. The discounted reward is calculated by repeatedly down-weighting recent rewards, by a factor of $\gamma \in [0, 1]$ \cite{RL:Sutton-Barto}
 \begin{equation*}
     G_t = r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} = \sum_{k=0}^{T} \gamma^k r_{t+k+1}
@@ -47,13 +35,9 @@ During learning, the agent observes the state $s_t$, selects and performs an act
     \label{Eq:Q-learning}
 \end{equation}
 where $\max_{a}Q(s_{t+1}, a)$ corresponds action selection policy. In this case the agent selects the best action it perceives to be able to perform. The $\alpha$ is used to adjust how much weight single sequence gets in update, thus representing update step size. At early stages of learning, the agent policy is far from optimal, but the agent learns iteratively to pick better actions. The learning process can be stopped at any point and the Q-values can be saved for later use. After training, it is adequate to pick the best actions based on the learned and stored Q-values, $Q(s_{t}, a_{t})$.
-%\mid t
-
-% which in this case is the best action that the agent perceives to be able to perform.
 
 During the learning phase, the agent must select and test actions in order to learn. The simplest action selection rule is to pick an action producing the highest estimated value, $\max_{a}Q(s_{t+1}, a)$. Such greedy action selection always exploits the current knowledge, which is problematic in case where better actions exist, but the agent is not aware of these. Better learning performance can be achieved by behaving greedily most of the time, but with small probability $\epsilon$, the agent may randomly test a new action. Action testing is called exploration. The methods allowing exploration with probability $\epsilon$ are called $\epsilon$-greedy methods. In noisy environments, these are better than plain greedy methods, as it requires more exploration to find the optimal actions due to noisier rewards. The measured speed signal with electric motors is often quite noisy, which advocates use of $\epsilon$-greedy action selection policy. \cite{RL:Sutton-Barto}
 
-%\pi(a|s)=\begin{cases}
 The probability $\epsilon$ is used to set balance between exploration and exploiting. The action selection policy can be described with \cite{RL:Sutton-Barto}
 \begin{equation}
   a \leftarrow \begin{cases}
@@ -71,27 +55,9 @@ where $\epsilon$ can be a constant value or it can be also gradually decreased. 
   \label{Eq:glie}
 \end{equation}
 where the $k_\epsilon$ is some constant integer and $i$ is the iteration number. From \eqref{Eq:epsilon-greedy} and \eqref{Eq:glie} it can be seen that high $k_\epsilon$ value encourages the agent to explore more than with low $k_\epsilon$ value. By gradually decreasing the $\epsilon$, the learning may happen faster than with a constant value.
-%The $\epsilon$ is gradually decreased over time \cite{RL:GLIE}
 
-%. The $\epsilon$-greedy was used to train the compensator.
-%a random action is chosen with probability $1-\epsilon$. 
-% The ratio between exploration and exploitation can be adjusted and this practice may lead to faster converge.
-% can be adjusted by declaring a parameter $k$
-
-%Therefore, an exploration policy is needed for deciding whether the agent should try something new, or if it should utilize already learnt information. An $\epsilon$-geedy exploration policy was used. The $\epsilon$-geedy is policy in which a random action is chosen with probability $\epsilon$, and $\epsilon$ is gradually decreased over time \cite{RL:GLIE}.
-
-%In practice, the Q-learning is used to overcome two problems. Firstly, it is used to train the agent to automatically find states when compensation should be applied. Since the agent determines the states itself, the measured pulsations can have lag from real pulsations. Secondly, the agent also learns to select actions corresponding to magnitudes, that minimizes the torque pulsation at certain state. Learning to do this may require data from numerous iterations, yet this should not be a problem in case of an electric motor as it produces great amounts of data just by rotating continuously.
-
-%In practice, the Q-learning is used to train the agent to automatically select actions corresponding to magnitudes, that minimizes the torque pulsation at certain state. Learning to do this may require data from numerous iterations. However, the data sparseness is not a problem, since electric motor as it produces great amounts of data just by rotating continuously.
-
-%yet this should not be a problem in case of an electric motor as it produces great amounts of data just by rotating continuously.
 
 \subsection{Torque based learning scheme}
-
-
-%An example of use of the generated actions can be seen in Fig. \ref{fig:learned_pattern_torque}. 
-%Only five actions were generated between $[-0.23, 0.23]$. The agent used four of these actions for compensation. The dots represent instants where the agent was able to select an action. In total, there are 100 dots, since the rotor angle was quantized to 100 states. The selected actions clearly form a waveform pattern, which indicates that the agent is not selecting actions by random.
-
 It has been discussed how the torque ripple problem can be formalized and how the agent learns through rewards, but it has been left unclear how the "goodness" of actions can be evaluated and what should be given as a reward. This ultimately depends on the objective and the system. In this study, the system is motor drive and the objective is to minimize torque pulsations. To meet the goal, the rewarding process should connect actions and torque pulsations. This connection allows the agent to perceive the influence of its actions, which makes it possible for the agent to adjust its behaviour in order to maximize the expected reward. A reward function can be used to generate a reward at each time instant.
 
 Assuming that produced torque can be measured, the reward function can be very simple. The reward can be given based on how closely the agent is able to follow the desired torque value, $-|T^* - T_m|$. The expression is multiplied with $-1$ to make the agent to try to minimize the torque error. In order to maximize the reward and to minimize the error, the agent would need to find a way to compensate disturbances by using predefined actions.
@@ -104,42 +70,10 @@ The simple torque based learning scheme was tested in the simulator. The agent w
     \label{fig:qlr_torque_reward}
 \end{figure}
 
-%The compensator is able to significantly reduce harmonics, even with rough approximations. The policy producing compensation pattern in Fig. \ref{fig:learned_pattern_torque}, was used to compensate sixth harmonic in simulated environment. The compensator was able to reduce the harmonic approximately to one fourth from the original, as can be seen in the Fig. \ref{Fig:Qlr-torque-compensation}. It appears that large steps are not a barrier for compensation. Therefore, the number of actions can be set to be low, if faster training time and smaller memory consumption are desired with the expense of compensation performance.
-%\begin{figure}
-%\centering
-%\begin{subfigure}{0.5\textwidth}
-%  \centering
-%  \includegraphics[width=\textwidth]{images/Qlr-no-compensation-f.pdf}
-%  \caption{uncompensated, FFT}
-%  \label{fig:sub1}
-%\end{subfigure}%
-%\begin{subfigure}{.5\textwidth}
-%  \centering
-%  \includegraphics[width=\textwidth]{images/Qlr-t-compensation-f.pdf}
-%  \caption{compensated, FFT}
-%  \label{fig:sub2}
-%\end{subfigure}
-%\caption{Torque trained compensator disabled and enabled}
-%\label{Fig:Qlr-torque-compensation}
-%\end{figure}
-
 The torque based learning scheme is unfortunately highly impractical, since torque measurement or suitable estimate is rarely available. Creating an accurate torque estimator is a complex task and therefore this option should be avoided. It is also good to be aware that already existing torque estimation scheme cannot be utilized. The agent produces torque by injecting to q-axis current reference $i^*_q$ which corrupts the torque signal for learning purposes. If the agent sees its own injections directly from the estimated torque signal, then often the best method to minimize the pulsations is to do nothing.
 
-%In reinforcement learning, the RL-algorithm needs to find an optimal policy by interacting with the MDP \cite{RL:Single-step}.
-
-%Q-learning is an off-policy algorithm, which conceptually allows exploration by using hypothetical actions \cite{RL:Single-step}. This property is beneficial in applications where exploration may be dangerous to do otherwise, as it still makes it possible to train the agent.
-
-%In Q-learning the object is to estimate Q-values, for an optimal policy \cite{RL:Watkins-Q}.
-
-%\begin{figure}[ht] 
-%    \centering
-%    \includegraphics[width=\textwidth]{images/learned-compensation-pattern.pdf}
-%    \caption{\small Learned compensation pattern with respect to the rotor angle}
-%    \label{fig:learned_pattern_torque}
-%\end{figure}
 
 \subsection{Speed based learning scheme}
-
 The learning can be done by utilizing the speed signal. A speed based compensation scheme is more practical compared to the torque based counterpart, since speed sensors are more commonly available by default than torque measuring instruments. Furthermore, by inspecting the ILC compensator development trend in \cite{ILC:2004} and \cite{ILC:2005}, it appears that the speed signal based compensator was found more successful.
 
 The motor speed depends on torque according to \eqref{Eq:transfer_function}. By inspecting computed speed and torque in Fig. \ref{SDM_speed_torque}, it can be observed that there is a phase shift between the two signals. This is exceedingly problematic when considering speed based rewarding. If the effects of torque alternation are not immediately visible, then the agent cannot know what consequences its actions had. In the worst case, the agent tries to apply brief torque impulses that are invisible for it, but stress the system in reality. Therefore, the prior rewarding scheme cannot be used directly with speed based learning. The reward function must be modified.
@@ -161,14 +95,10 @@ The agent was found to behave differently depending on how the reward terms are 
     \label{fig:lambda}
 \end{figure}
 
+
 \subsection{Hyperparameters} \label{hyperparameters}
 Hyperparameters are parameters that are set before training and have an effect on the learning rate and outcome. Such parameters are the discount factor $\gamma$, learning rate $\alpha$, weighing factor $\lambda$ and coefficient $k_\epsilon$ used to set epsilon decay rate. These parameters must be set only once for a particular system. The same hyperparameters are likely to work with variety of different PM motors as long as the whole system stays similar. In \cite{RL:atari} the same hyperparameters were successfully used to train the agent to play various video games. In simulations, the same hyperparameters were successfully used to train the compensator to work with all four tested PM motors. By using the same hyperparameters, the training process may not be optimal, but this approach can still yield satisfying learning results.
 
-%However, optimal learning rate can be only achieved by selecting the parameters individually for all cases.
-
-%  Two of these motors roughly modelled the motors used in experiments. It was found that the same hyperparameters could be also used with the real motors, although faster learning was achieved by adjusting the parameters.
-
-% \ref{fig:glie}
 Figures \ref{fig:gamma}, \ref{fig:alpha} and \ref{fig:glie} show averaged cumulative sums of rewards obtained during one mechanical revolution. Averaging makes the trends more clear, since instaneous rewards can be very noisy. Nevertheless, the most important information that the plots provide are the relative growth rates between the different scenarios and this information can be used for concluding approximately the best hyperparameter values for the system. In general, such hyperparameter values should be selected that provide the best learning outcome and make the learning happen in the shortest time. When considering the learning rate, the first few hundred iterations should be emphasized if the agent can cause superfluous stress to the system. Periodical rewards in Fig. \ref{fig:qlr_torque_reward} illustrate that most of nonsensical actions are performed during early phase of training. Therefore, the risk of damaging the system is the greatest when training is started. Since unnecessarily large current injections generate heat, it is desired to select such hyperparameter values that let the agent to reach sufficient performance level quickly, even at the expense of slightly decreasing total learning rate.
 \begin{figure}[htb] 
     \centering
@@ -188,7 +118,7 @@ The parameter $\gamma$ defines discount rate for rewarding. It has effect on how
 In order to demonstrate the effects of the learning rate $\alpha$ in the simulation environment, noise had to be generated. Therefore, white noise having maximum amplitude of 30\% of the measured speed, was injected to the compensator speed input signal. With constant $60$ rpm speed, the compensator speed input can vary between $42-78$ rpm due to added noise. Figure \ref{fig:alpha} shows that learning is slower, when doing considerable updates with large $\alpha$. With smaller update steps, the learning is faster in noisy environment. While considering the early learning speed, the value of $\alpha = 0.3$ was selected to be used.
 
 The $\epsilon$-greedy policy is used for training. The different $\epsilon$ decrease rates lead to different learning behaviour. Figure \ref{fig:glie} illustrates learning with different $k_\epsilon$ values. It appears that there is no significant differences between selections. Value of $k_\epsilon = 300$ was selected to be used in simulations.
-%The learning appears to be fastest and most stable with values $k=200$ and $k=500$, hence $k=300$ was used in experiments.
+
 \begin{figure}[htb] 
     \centering
     \includegraphics[width=\textwidth]{images/Qk_wide.pdf}
@@ -196,25 +126,4 @@ The $\epsilon$-greedy policy is used for training. The different $\epsilon$ decr
     \label{fig:glie}
 \end{figure}
 
-%It is good to note that hyperparameters can be selected simply by testing what works the best in the actual motor drive system. This approach can yield better parameter values than simulations based analysis, since it is difficult to accurately model the actual system requiring compensation.
-
-%\subsection{Automating the choke-gain search}
-%Motor nominal torque as an input. Calculate e.g. 20 percent value. Use this value as an upper limit. Sweep from zero to upper limit. Record each op. reward average. If average is going worse twice, or exceeding the limit, then stop. Pick the gain producing the best average.
-
-
-%\subsection{Training}
-
-%It was found that compensation performance is worse, if high rotation speed is used during training phase. The performance penalty can be potentially explained with state skips that occur in high speeds. Due to fast rotation speed, not all states gets visited and thus reduced amount of Q-values gets updated. With lower rotation speed, no such skipping occurs. The crucial point between high and low speeds depends on number of states. For example, with $100$ states the rotor should always rotate less than $0.01 \cdot 2\pi \approx 0.06$ rad during iteration, in order not to skip states.
-
-
-%Can be trained off-line or on-line. It is also possible pretrain by using simulator and the finalize training on-line. Cogging is static so it can be learnt in simulator, whereas dynamic effects such as temperature related changes cannot be learnt.
-
-
-
-% Episode length:
-%First tell what episode is ...
-%Negligible amount of time is spent in startup procedure when considering normal lifetime usage of a machine. Therefore, it is not very beneficial to try optimize startup behaviour. Moreover, trying to learn during startup can surprisingly degrade the overall performance of the compensator. This is because wheights (*fix: weights do not try to generalize*) generalize the problem, so learning completely different behaviour from normal, offsets the weights from the optimal values for normal use. Therefore, the startup procedure should not be tried to learnt.
-
-
-% In [joku] it was also observed that Q-learning performs badly, if the environment is POMDP. Thus, it can be concluded that Q-learning should not be used as is for learning the compensation pattern from the speed signal. Some modifications has to be made. At this point, it is feasible to question if some different RL-algorithm should be used. However, the Q-learning was specifically chosen due to its simple structure, which allows the solution to be implemented on already commissioned drives that can be years old. Therefore, resorting to more sophisticated algorithms, which often use neural networks, was not an option. Fortunately, the problem can be circumvented and it is not necessary to move on to more complex schemes.
 \clearpage
